@@ -28,8 +28,8 @@ git commit -m '.gitignore-d node_modules'
 
 The first external dependency we're going to use is the Express web framework,
 which I showed you briefly. Check out the "Getting started" guide, starting
-about at "Now to create the application itself!" (everything before we've done
-or is outdated): http://expressjs.com/guide.html
+about at "Now to create the application itself!" (everything before that, we've
+done or is outdated): http://expressjs.com/guide.html
 
 To install it, and simultaneously add it to the `dependencies` in our
 `package.json`, just do:
