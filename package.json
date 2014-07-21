@@ -11,5 +11,8 @@
   "bugs": {
     "url": "https://github.com/laughinghan/node_intro/issues"
   },
-  "homepage": "https://github.com/laughinghan/node_intro"
+  "homepage": "https://github.com/laughinghan/node_intro",
+  "dependencies": {
+    "express": "~4.6.1"
+  }
 }
