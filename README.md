@@ -38,3 +38,21 @@ npm install --save express
 ```
 (Then add and commit the change to `package.json`, of course.)
 
+#### Step 2: Express "Hello World"
+
+Now if you create an `index.js` containing:
+```js
+var express = require('express');
+var app = express();
+
+app.get('/', function(request, response) {
+  response.send('Hello World');
+});
+
+var server = app.listen(process.env.PORT || 3000, function() {
+  console.log('Listening on port', server.address().port);
+});
+```
+and run `node .` and go to `http://localhost:3000` in your browser, you should
+see "Hello World" in your browser.
+
