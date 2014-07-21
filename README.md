@@ -67,3 +67,26 @@ var server = app.listen(process.env.PORT || 3000, function() {
 and run `node .` and go to `http://localhost:3000` in your browser, you should
 see "Hello World" in your browser.
 
+#### Step 3: Heroku
+
+If you started with an empty Git repo, and not an existing trivial Heroku app,
+you'll have to do `heroku create` (which has options; `heroku help create` for
+more).
+
+Also make sure you have a `Procfile` with the line:
+```
+web: node .
+```
+(More details about the `Procfile`: https://devcenter.heroku.com/articles/procfile )
+
+So if you do `foreman start`, you should get:
+```
+15:42:59 web.1  | started with pid 46590
+15:42:59 web.1  | Listening on port 5000
+```
+(but with different timestamps and `pid`, of course.)
+And if you now visit `http://localhost:5000` in your browser, you should again
+see "Hello World" in your browser.
+
+(Remember to add and commit the `Procfile`.)
+
