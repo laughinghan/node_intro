@@ -90,3 +90,67 @@ see "Hello World" in your browser.
 
 (Remember to add and commit the `Procfile`.)
 
+Part of the charm of Heroku is that if it works locally on your machine with
+`foreman start`, it should work on the Big Bad Web. Try it,
+`git push heroku master` should result in (in something like):
+```sh
+Fetching repository, done.
+Counting objects: 27, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (25/25), done.
+Writing objects: 100% (27/27), 3.98 KiB | 0 bytes/s, done.
+Total 27 (delta 8), reused 0 (delta 0)
+
+-----> Node.js app detected
+
+       PRO TIP: Specify a node version in package.json
+       See https://devcenter.heroku.com/articles/nodejs-support
+
+-----> Defaulting to latest stable node: 0.10.29
+-----> Downloading and installing node
+-----> Exporting config vars to environment
+-----> Installing dependencies
+       express@4.6.1 node_modules/express
+       ├── merge-descriptors@0.0.2
+       ├── utils-merge@1.0.0
+       ├── parseurl@1.1.3
+       ├── cookie@0.1.2
+       ├── escape-html@1.0.1
+       ├── finalhandler@0.0.3
+       ├── cookie-signature@1.0.4
+       ├── range-parser@1.0.0
+       ├── fresh@0.2.2
+       ├── vary@0.1.0
+       ├── qs@0.6.6
+       ├── media-typer@0.2.0
+       ├── methods@1.1.0
+       ├── serve-static@1.3.2
+       ├── buffer-crc32@0.2.3
+       ├── depd@0.3.0
+       ├── path-to-regexp@0.1.3
+       ├── debug@1.0.3 (ms@0.6.2)
+       ├── proxy-addr@1.0.1 (ipaddr.js@0.1.2)
+       ├── type-is@1.3.2 (mime-types@1.0.1)
+       ├── send@0.6.0 (ms@0.6.2, mime@1.2.11, finished@1.2.2)
+       └── accepts@1.0.7 (negotiator@0.4.7, mime-types@1.0.1)
+-----> Caching node_modules directory for future builds
+-----> Cleaning up node-gyp and npm artifacts
+-----> Building runtime environment
+-----> Discovering process types
+       Procfile declares types -> (none)
+
+-----> Compressing... done, 5.4MB
+-----> Launching... done, v3
+       http://intense-lake-7035.herokuapp.com/ deployed to Heroku
+
+To git@heroku.com:intense-lake-7035.git
+ + 38c4c1d...c8287e2 master -> master
+```
+Then `heroku open` should open your app in the browser (in my case,
+`http://intense-lake-7035.herokuapp.com/`). If ever you open it up in the
+browser and see that your app has crashed, `heroku logs` is your friend.
+(I was getting `error code=H14 desc="No web processes running"` for some reason;
+turned out that when I accidentally forgot to add and commit the `Procfile`
+before pushing to Heroku, and adding that in isn't enough to fix that, [you have
+to do `heroku ps:scale web=1`](http://stackoverflow.com/q/9970151#comment29633666_19694692).)
+
