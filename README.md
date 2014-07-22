@@ -154,3 +154,65 @@ turned out that when I accidentally forgot to add and commit the `Procfile`
 before pushing to Heroku, and adding that in isn't enough to fix that, [you have
 to do `heroku ps:scale web=1`](http://stackoverflow.com/q/9970151#comment29633666_19694692).)
 
+#### Step 4: Views
+
+We shouldn't actually have the HTML source of our webpages in `index.js`, of
+course. The standard thing to do is to have HTML templates in the `views` folder
+in some templating language like [Jade](http://jade-lang.com) (ships with
+Express, because it's also by TJ Holowaychuk) or [Handlebars](http://handlebarsjs.com/),
+and then do [`response.render()`](http://expressjs.com/api.html#res.render) with
+the path to the desired view (the docs are pretty vague, unfortunately).
+
+(The HTML templates would link to static assets like stylesheets, images, and
+client-side JS in a `public` directory: https://github.com/visionmedia/express/tree/master/examples/static-files )
+
+We're gonna skip that, and just manually read `.html` files from our `views/`
+folder.
+
+Create a `views/index.html` containing:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JS Bin</title>
+</head>
+<body>
+  <h1>Question form</h1>
+  <form action="/submit">
+    <p><input type="text" name="name" placeholder="Your Name" /></p>
+    <p><textarea name="question" placeholder="Your question..."></textarea></p>
+    <p><input type="submit" /></p>
+  </form>
+</body>
+</html>
+```
+
+Then, in `index.js`, add at the very top:
+```js
+var fs = require('fs');
+```
+to access the [File System API](http://nodejs.org/api/fs.html#fs_file_system),
+and replace where we currently have:
+```js
+app.get('/', function(request, response) {
+  response.send('Hello World');
+});
+```
+with a [`fs.readFile()`](http://nodejs.org/api/fs.html#fs_fs_readfile_filename_options_callback)
+call to read `views/index.html` and send that as a response (pass in an
+encoding so that `fs.readFile()` gives us a string and not a buffer, so that
+[`response.send()`](http://expressjs.com/api.html#res.send) sends it to the
+browser as HTML):
+```js
+app.get('/', function(request, response) {
+  fs.readFile('views/index.html', { encoding: 'utf8' }, function(error, contents) {
+    response.send(contents);
+  });
+});
+```
+
+Now if you `foreman start` and open `localhost:5000` in your browser again,
+you should see the question form as your homepage, and if you add and commit
+all this and push to Heroku, the homepage online should also be the question
+form.
+
