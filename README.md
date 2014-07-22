@@ -254,3 +254,28 @@ If you (`foreman start` again and) go to the homepage and submit the question
 form, you should hopefully see that you successfully parsed out and used the
 name and question submitted in the form. Good time to commit your code.
 
+#### Step 6: MongoDB
+
+We now have access to data submitted by the form, but we don't save it to any
+kind of persistent storage (i.e., a database). We can't just save it to a
+global variable or something, our app restarts regularly (every time we push
+to Heroku, in fact), and multiple instances could be running at a time (which
+wouldn't share global variables).
+
+We're going to use MongoDB for our database because it's relatively easy to
+hit the ground running, but the landscape of database offerings is wide and
+varied and often have nothing in common but storing persistent data.
+(There is a large class of traditionally dominant databases called relational
+databases that shared a reasonably uniform interface called SQL; MongoDB is
+typically classified as a "NoSQL" database, and one of the ways it contrasts
+with relational databases is being easier to get started.)
+
+There's 3 pieces of setup we need to use MongoDB.
+- We need to install MongoDB on our computer: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/
+- We need a MongoDB Heroku add-on, which is [apparently](https://devcenter.heroku.com/articles/getting-started-with-nodejs#using-mongodb)
+  as easy as `heroku addons:add mongolab`
+- The Node.js package we're writing needs, as an external dependency, a Node.js
+  module our JS can call to talk to MongoDB: `npm install --save mongodb`
+  Just like when you did `npm install --save express`, you'll need to add and
+  commit the change to your `package.json`.
+

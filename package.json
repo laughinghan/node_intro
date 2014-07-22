@@ -13,6 +13,7 @@
   },
   "homepage": "https://github.com/laughinghan/node_intro",
   "dependencies": {
-    "express": "~4.6.1"
+    "express": "~4.6.1",
+    "mongodb": "~1.4.7"
   }
 }
