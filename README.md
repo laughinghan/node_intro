@@ -216,3 +216,41 @@ you should see the question form as your homepage, and if you add and commit
 all this and push to Heroku, the homepage online should also be the question
 form.
 
+#### Step 5: Form Submission
+
+If you try submitting the form, of course, it submits to the `action` URL of
+the form, which is `/submit`, but our Express app is only configured to respond
+to `/` (those are called routes, by the way).
+
+Let's add a route `/submit` to `index.js`:
+```js
+app.get('/submit', function(request, response) {
+  response.send('The form submission page!');
+});
+```
+
+You should now see (if you `foreman start` again, of course)
+"The form submission page!" when you go to `http://localhost:5000/submit`, or
+when you submit the question form.
+
+Note that when you submit the question form, though, you don't actually go
+to `http://localhost:5000/submit`, you in fact go to something like
+`http://localhost:5000/submit?name=Han&question=What+is+the+meaning+of+life`.
+
+The part of the URL after the question mark `?` is the query string, and those
+key/value pairs are query parameters, which Express helpfully parses from the
+request as a JS object, [`request.query`](http://expressjs.com/api.html#req.query).
+In this case, our form's inputs' names were `name` and `question`, so we can
+update our `/submit` route:
+```js
+app.get('/submit', function(request, response) {
+  var name = request.query.name;
+  var question = request.query.question;
+  response.send('The form submission page! Your name is '+name+', and your question is:'+question);
+});
+```
+
+If you (`foreman start` again and) go to the homepage and submit the question
+form, you should hopefully see that you successfully parsed out and used the
+name and question submitted in the form. Good time to commit your code.
+

@@ -9,6 +9,12 @@ app.get('/', function(request, response) {
   });
 });
 
+app.get('/submit', function(request, response) {
+  var name = request.query.name;
+  var question = request.query.question;
+  response.send('The form submission page! Your name is '+name+', and your question is: '+question);
+});
+
 var server = app.listen(process.env.PORT || 3000, function() {
   console.log('Listening on port', server.address().port);
 });
