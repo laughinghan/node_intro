@@ -278,11 +278,142 @@ typically classified as a "NoSQL" database, and one of the ways it contrasts
 with relational databases is being easier to get started.)
 
 There's 3 pieces of setup we need to use MongoDB.
-- We need to install MongoDB on our computer: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/
+- We need to install MongoDB locally on your machine: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/
 - We need a MongoDB Heroku add-on, which is [apparently](https://devcenter.heroku.com/articles/getting-started-with-nodejs#using-mongodb)
   as easy as `heroku addons:add mongolab`
 - The Node.js package we're writing needs, as an external dependency, a Node.js
   module our JS can call to talk to MongoDB: `npm install --save mongodb`
   Just like when you did `npm install --save express`, you'll need to add and
   commit the change to your `package.json`.
+
+Great, so we have MongoDB and the `mongodb` npm module. How do we use them?
+This purports to be an intro to both: http://mongodb.github.io/node-mongodb-native/api-articles/nodekoarticle1.html
+
+First step for our JS to use the `mongodb` npm module, add at the beginning
+of `index.js`:
+```js
+var MongoClient = require('mongodb').MongoClient;
+```
+
+Then we want our code to talk to an actual MongoDB database (via `mongodb`)
+using `MongoClient.connect()`, but before we quite get there, let's think about
+_when_ we want to do so (which helps us figure out _where_ to do so). What we'd
+like is, while our Web server is up and running and serving requests, we're able
+to store and retrieve stuff from MongoDB. So, we'd like to have a connection to
+MongoDB available to us by the time we're up and running and serving requests.
+
+In a real app, you'd do the connection setup in parallel with setting up the
+Express web server, but I don't want to have to explain how that would work,
+you can learn how to do that on your own (with Promises, for example). We're
+just gonna connect to MongoDB first, and only do all that Express stuff once
+we've got our connection to MongoDB, so `index.js` looks like this now:
+```js
+var fs = require('fs');
+var express = require('express');
+var MongoClient = require('mongodb').MongoClient;
+
+var mongoUri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb';
+MongoClient.connect(mongoUri, function(error, db) {
+  if (error) throw error;
+  console.log('Connected to MongoDB at', mongoUri);
+
+  var app = express();
+
+  app.get('/', function(request, response) {
+    fs.readFile('views/index.html', { encoding: 'utf8' }, function(error, contents) {
+      if (error) throw error;
+      response.send(contents);
+    });
+  });
+
+  app.get('/submit', function(request, response) {
+    var name = request.query.name;
+    var question = request.query.question;
+    response.send('The form submission page! Your name is '+name+', and your question is: '+question);
+  });
+
+  var server = app.listen(process.env.PORT || 3000, function() {
+    console.log('Listening on port', server.address().port);
+  });
+});
+```
+(the `mongoUri` line is [from the Heroku tutorial](https://devcenter.heroku.com/articles/getting-started-with-nodejs#using-mongodb))
+at which point `foreman start` should yield something like:
+```
+16:53:29 web.1  | started with pid 48745
+16:53:30 web.1  | Connected to MongoDB at mongodb://localhost/mydb
+16:53:30 web.1  | Listening on port 5000
+```
+(If you're instead getting something like:
+```
+16:51:32 web.1  | started with pid 48726
+16:51:32 web.1  | /Users/han/Desktop/node_intro/node_modules/mongodb/lib/mongodb/mongo_client.js:409
+16:51:32 web.1  |           throw err
+16:51:32 web.1  |                 ^
+16:51:32 web.1  | Error: failed to connect to [localhost:27017]
+16:51:32 web.1  |     at null.<anonymous> (/Users/han/Desktop/node_intro/node_modules/mongodb/lib/mongodb/connection/server.js:546:74)
+16:51:32 web.1  |     at EventEmitter.emit (events.js:106:17)
+16:51:32 web.1  |     at null.<anonymous> (/Users/han/Desktop/node_intro/node_modules/mongodb/lib/mongodb/connection/connection_pool.js:150:15)
+16:51:32 web.1  |     at EventEmitter.emit (events.js:98:17)
+16:51:32 web.1  |     at Socket.<anonymous> (/Users/han/Desktop/node_intro/node_modules/mongodb/lib/mongodb/connection/connection.js:533:10)
+16:51:32 web.1  |     at Socket.EventEmitter.emit (events.js:95:17)
+16:51:32 web.1  |     at net.js:441:14
+16:51:32 web.1  |     at process._tickCallback (node.js:415:13)
+16:51:32 web.1  | exited with code 8
+16:51:32 system | sending SIGTERM to all processes
+SIGTERM received
+```
+well, the key line there is `Error: failed to connect` to MongoDB, most likely
+because there's no MongoDB server to connect to running on your machine, did you
+[run `mongod` after installing MongoDB on your machine](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/#run-mongodb)?
+On my machine with MongoDB v2.6.3, it actually complained about `/data/db`:
+```
+*********************************************************************
+ ERROR: dbpath (/data/db) does not exist.
+ Create this directory or give existing directory in --dbpath.
+ See http://dochub.mongodb.org/core/startingandstoppingmongo
+*********************************************************************
+```
+which, like, you think they could've chosen a directory they'd be more likely
+to have write permissions to, but anyway, I fixed it by running
+`mongod --dbpath /tmp`, and got much less scary log messages ending with:
+```
+2014-07-23T00:35:56.763-0700 [initandlisten] waiting for connections on port 27017
+```
+)
+
+Great, so you're connected to MongoDB. How do we write stuff to it? First, we
+need a "collection" to insert "documents" into, as MongoDB calls them, so:
+```diff
+   if (error) throw error;
+   console.log('Connected to MongoDB at', mongoUri);
++  var collection = db.collection('form_results');
+
+   var app = express();
+```
+Now for the "documents" we want to insert, i.e. form submission data. When do
+we have that and want to insert it? When a form is submitted, i.e. `/submit`,
+so change your `/submit` route to something like:
+```js
+  app.get('/submit', function(request, response) {
+    var doc = {
+      name: request.query.name,
+      question: request.query.question,
+      timestamp: Date.now()
+    };
+    collection.insert(doc, function(error) {
+      if (error) {
+        console.error(error);
+        response.send('I\'m sorry, there was a problem saving your form submission: ' + error);
+      } else {
+        response.send('Your form submission has been successfully saved!');
+      }
+    });
+  });
+```
+
+`foreman start` and submitting the form in the browser should now get you
+something like "Your form submission was successfully saved on Wed Jul 23 2014
+02:25:26 GMT-0700 (PDT)! Your name is Han, and your question is: What is the
+meaning of life". Add, commit, check that it also works on Heroku.
 
