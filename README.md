@@ -424,3 +424,63 @@ something like "Your form submission was successfully saved on Wed Jul 23 2014
 02:25:26 GMT-0700 (PDT)! Your name is Han, and your question is: What is the
 meaning of life". Add, commit, check that it also works on Heroku.
 
+#### Step 7: Finally, Display Form Submission Results
+
+What I'm gonna do is make a new route, `/results` that, when requested,
+queries MongoDB for form submission results and displays them as HTML:
+```js
+  app.get('/results', function(request, response) {
+    collection.find().toArray(function(error, items) {
+      var results = '';
+      for (var i = 0; i < items.length; i += 1) {
+        results += '<p>Timestamp: '+new Date(items[i].timestamp);
+        results += '<p>Name: '+items[i].name;
+        results += '<p>Question: '+items[i].question;
+      }
+      response.send(results);
+    });
+  });
+```
+Now (after `foreman start` again) if you go to `http://localhost:5000/results`,
+you should see each name and question you've submitted to your form since
+you got "You form submission was succesffully saved..." working, and if you go
+to the form again and submit more questions and refresh `/results`, the new
+questions you added should also show up.
+
+Note that the form submission results will persist past restarting your server
+to, for example, change what the results page looks like, because it's all
+saved in MongoDB.
+
+If you commit and push to Heroku, it should also work, although it will only
+have data from form submissions you did on the online, live-on-Heroku form, do
+you know why?
+
+Also note many things that would be done different in a real app:
+- our results "page" isn't much of a page, more of an HTML snippet; this is
+  _exactly_ the use case of templates for pages, you could have a full-fledged
+  results page with a spot marked out where info from the database goes
+- we generated the HTML to display with a loop in JS, but templating languages
+  always have some way to loop over an array to generate lots of similar HTML
+  (i.e. following a template), one per array item, like
+  [`each` in Handlebars](http://handlebarsjs.com/#iteration) (some, [like EJS,
+  still use JS loops](http://embeddedjs.com/getting_started.html#create_template),
+  but it's still better because it's in the template)
+- our 3 pages--homepage with question form, submission page, results page,
+  should probably all at least link to each other if not be reduced/unified
+  into fewer pages. The `/submit` route, for example, after inserting the data
+  into MongoDB, could [redirect](http://expressjs.com/api.html#res.redirect)
+  back to the homepage with the question form, which in turn could show all the
+  questions that have been asked so far.
+- MongoDB's `.toArray()` on collections you pretty much should never do in
+  Real Life, because that tries to load the entire collection in the database
+  as an array no matter how big it is, in Real Life you'd always want some
+  kind of limit on how many items to return at most, after all, there's a limit
+  to how much you'd show the end-user, right?
+
+Those are just a few ideas for improvements you should try making, but now you
+see the flow of data from form submission to database and then back out as
+result data, and you know where to find API documentation to change any of the
+code we've written so far, right?
+
+Well, don't just sit there, get crackin'! There's so much more to learn!
+

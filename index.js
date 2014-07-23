@@ -33,6 +33,18 @@ MongoClient.connect(mongoUri, function(error, db) {
     });
   });
 
+  app.get('/results', function(request, response) {
+    collection.find().toArray(function(error, items) {
+      var results = '';
+      for (var i = 0; i < items.length; i += 1) {
+        results += '<p>Timestamp: '+new Date(items[i].timestamp);
+        results += '<p>Name: '+items[i].name;
+        results += '<p>Question: '+items[i].question;
+      }
+      response.send(results);
+    });
+  });
+
   var server = app.listen(process.env.PORT || 3000, function() {
     console.log('Listening on port', server.address().port);
   });
