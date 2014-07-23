@@ -160,7 +160,7 @@ We shouldn't actually have the HTML source of our webpages in `index.js`, of
 course. The standard thing to do is to have HTML templates in the `views` folder
 in some templating language like [Jade](http://jade-lang.com) (ships with
 Express, because it's also by TJ Holowaychuk) or [Handlebars](http://handlebarsjs.com/),
-and then do [`response.render()`](http://expressjs.com/api.html#res.render) with
+and then do [`response.render()`](http://expressjs.com/4x/api.html#res.render) with
 the path to the desired view (the docs are pretty vague, unfortunately).
 
 (The HTML templates would link to static assets like stylesheets, images, and
@@ -201,7 +201,7 @@ app.get('/', function(request, response) {
 with a [`fs.readFile()`](http://nodejs.org/api/fs.html#fs_fs_readfile_filename_options_callback)
 call to read `views/index.html` and send that as a response (pass in an
 encoding so that `fs.readFile()` gives us a string and not a buffer, so that
-[`response.send()`](http://expressjs.com/api.html#res.send) sends it to the
+[`response.send()`](http://expressjs.com/4x/api.html#res.send) sends it to the
 browser as HTML):
 ```js
 app.get('/', function(request, response) {
@@ -246,7 +246,7 @@ to `http://localhost:5000/submit`, you in fact go to something like
 
 The part of the URL after the question mark `?` is the query string, and those
 key/value pairs are query parameters, which Express helpfully parses from the
-request as a JS object, [`request.query`](http://expressjs.com/api.html#req.query).
+request as a JS object, [`request.query`](http://expressjs.com/4x/api.html#req.query).
 In this case, our form's inputs' names were `name` and `question`, so we can
 update our `/submit` route:
 ```js
@@ -468,7 +468,7 @@ Also note many things that would be done different in a real app:
 - our 3 pages--homepage with question form, submission page, results page,
   should probably all at least link to each other if not be reduced/unified
   into fewer pages. The `/submit` route, for example, after inserting the data
-  into MongoDB, could [redirect](http://expressjs.com/api.html#res.redirect)
+  into MongoDB, could [redirect](http://expressjs.com/4x/api.html#res.redirect)
   back to the homepage with the question form, which in turn could show all the
   questions that have been asked so far.
 - MongoDB's `.toArray()` on collections you pretty much should never do in
