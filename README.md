@@ -7,9 +7,9 @@ Assumes you have a Heroku account and have installed the [Heroku Toolbelt]
 (https://toolbelt.heroku.com/) and are either in an existing trivial Heroku
 app, or an empty Node module (which you could create by doing [`npm init`]
 (https://www.npmjs.org/doc/cli/npm-init.html) in an empty directory, for
-example) that is also a Git repo with the `package.json` (created by `npm init`)
-committed ([crash course on Git](www.gitguys.com/topics/skip-the-intro/) if you
-don't know what that means).
+example) that is also a Git repo with the `package.json` committed
+([crash course on Git](www.gitguys.com/topics/skip-the-intro/) if you don't
+know what that means).
 
 Initially loosely follows the Heroku "Getting Started with Node.js" guide:
 https://devcenter.heroku.com/articles/getting-started-with-nodejs
