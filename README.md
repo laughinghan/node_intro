@@ -306,7 +306,8 @@ In a real app, you'd do the connection setup in parallel with setting up the
 Express web server, but I don't want to have to explain how that would work,
 you can learn how to do that on your own (with Promises, for example). We're
 just gonna connect to MongoDB first, and only do all that Express stuff once
-we've got our connection to MongoDB, so `index.js` looks like this now:
+we've got our connection to MongoDB, so `index.js` looks like this now
+(the `mongoUri` line is [from the Heroku tutorial](https://devcenter.heroku.com/articles/getting-started-with-nodejs#using-mongodb)):
 ```js
 var fs = require('fs');
 var express = require('express');
@@ -337,7 +338,6 @@ MongoClient.connect(mongoUri, function(error, db) {
   });
 });
 ```
-(the `mongoUri` line is [from the Heroku tutorial](https://devcenter.heroku.com/articles/getting-started-with-nodejs#using-mongodb))
 at which point `foreman start` should yield something like:
 ```
 16:53:29 web.1  | started with pid 48745
