@@ -366,18 +366,25 @@ SIGTERM received
 well, the key line there is `Error: failed to connect` to MongoDB, most likely
 because there's no MongoDB server to connect to running on your machine, did you
 [run `mongod` after installing MongoDB on your machine](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/#run-mongodb)?
-On my machine with MongoDB v2.6.3, it actually complained about `/data/db`:
+On my machine with MongoDB v2.6.3, just doing `mongod` actually didn't work,
+it died complaining about `/data/db`:
 ```
+...
+2014-07-22T17:08:10.157-0700 [initandlisten] exception in initAndListen: 10296
 *********************************************************************
  ERROR: dbpath (/data/db) does not exist.
  Create this directory or give existing directory in --dbpath.
  See http://dochub.mongodb.org/core/startingandstoppingmongo
 *********************************************************************
+, terminating
+2014-07-22T17:08:10.158-0700 [initandlisten] dbexit:
+...
 ```
 which, like, you think they could've chosen a directory they'd be more likely
 to have write permissions to, but anyway, I fixed it by running
 `mongod --dbpath /tmp`, and got much less scary log messages ending with:
 ```
+...
 2014-07-23T00:35:56.763-0700 [initandlisten] waiting for connections on port 27017
 ```
 )
