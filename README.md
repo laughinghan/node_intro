@@ -482,5 +482,7 @@ see the flow of data from form submission to database and then back out as
 result data, and you know where to find API documentation to change any of the
 code we've written so far, right?
 
-Well, don't just sit there, get crackin'! There's so much more to learn!
+Sweet, now you should try implementing any of the suggested improvements, or
+your own customizations. Don't just sit there reading this, get started!
+There's so much more to learn, fun to be had!
 
