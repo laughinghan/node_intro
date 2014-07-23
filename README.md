@@ -387,6 +387,7 @@ to have write permissions to, but anyway, I fixed it by running
 ...
 2014-07-23T00:35:56.763-0700 [initandlisten] waiting for connections on port 27017
 ```
+at which point `foreman start` of the `MongoClient.connect(...)` code worked.
 )
 
 Great, so you're connected to MongoDB. How do we write stuff to it? First, we
