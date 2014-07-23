@@ -5,6 +5,7 @@ var app = express();
 
 app.get('/', function(request, response) {
   fs.readFile('views/index.html', { encoding: 'utf8' }, function(error, contents) {
+    if (error) throw error;
     response.send(contents);
   });
 });

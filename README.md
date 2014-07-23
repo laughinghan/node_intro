@@ -206,10 +206,17 @@ browser as HTML):
 ```js
 app.get('/', function(request, response) {
   fs.readFile('views/index.html', { encoding: 'utf8' }, function(error, contents) {
+    if (error) throw error;
     response.send(contents);
   });
 });
 ```
+(Never ignore the `error` parameter to these callbacks, even when it should
+be impossible for there to be an error like in this case, where we're reading
+a hardcoded file; always at least do what I do here and fail catastrophically,
+because at least the error object will be in `heroku logs`. The Right Thing
+isn't to do that either of course, the Right Thing is to log the error and
+send an error page to the browser but try to keep chugging along regardless.)
 
 Now if you `foreman start` and open `localhost:5000` in your browser again,
 you should see the question form as your homepage, and if you add and commit
